@@ -10,14 +10,14 @@ dispatch commands to a pure (reconcile) function which updates a model, i.e. the
 * no addresses - communication is performed by calling explicit (dispatch) function
 * middleware can be added to any function; this is how logging of events and commands is implemented in examples
 * hot-reloading for free, thanks to Figwheel
-* random-gif-list uses Specter to update the nested model; compare it to more verbose "vanilla" updates in counter-list
+* *random-gif-list* uses Specter to update the nested model; compare it to more verbose "vanilla" updates in *counter-list*
 
 See original tutorial:
 https://github.com/evancz/elm-architecture-tutorial/
 
 Other implementations:
 * http://spin.atomicobject.com/2015/07/09/implementing-elm-architecture-clojurescript/
-* https://github.com/gaearon/react-elmish-example/tree/master/src/enhancers
+* https://github.com/gaearon/react-elmish-example/
 * https://github.com/Gozala/reflex-react-driver/tree/master/examples
 
 Also take a look at these UI libs: 
