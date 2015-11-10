@@ -5,7 +5,8 @@ Highlights:
 * side-effects are handled in a different way: view triggers "events", "events" can trigger "commands".
 Events from a view flow into a non-pure (control) function which can 
 dispatch commands to a pure (reconcile) function which updates a model, i.e. the flow is:
-model -> (view-model) -> (view) -event-> (control) -command-> (reconcile) -> model
+
+    model -> (view-model) -> (view) -event-> (control) -command-> (reconcile) -> model
 * no addresses - communication is performed by calling explicit (dispatch) function
 * middleware can be added to any function; this is how logging of events and commands is implemented in examples
 * hot-reloading for free, thanks to Figwheel
@@ -15,17 +16,17 @@ See original tutorial:
 https://github.com/evancz/elm-architecture-tutorial/
 
 Other implementations:
-http://spin.atomicobject.com/2015/07/09/implementing-elm-architecture-clojurescript/
-https://github.com/gaearon/react-elmish-example/tree/master/src/enhancers
-https://github.com/Gozala/reflex-react-driver/tree/master/examples
+* http://spin.atomicobject.com/2015/07/09/implementing-elm-architecture-clojurescript/
+* https://github.com/gaearon/react-elmish-example/tree/master/src/enhancers
+* https://github.com/Gozala/reflex-react-driver/tree/master/examples
 
 Also take a look at these UI libs: 
-[dominator](https://github.com/dubiousdavid/dominator)
-[re-frame](https://github.com/Day8/re-frame)
-[Om Next](https://github.com/omcljs/om/wiki/Quick-Start-(om.next))
-[Redux](https://github.com/rackt/redux)
-[Cerebral](https://github.com/christianalfoni/cerebral)
-[CycleJS](http://cycle.js.org/)
+* [dominator](https://github.com/dubiousdavid/dominator)
+* [re-frame](https://github.com/Day8/re-frame)
+* [Om Next](https://github.com/omcljs/om/wiki/Quick-Start-(om.next))
+* [Redux](https://github.com/rackt/redux)
+* [Cerebral](https://github.com/christianalfoni/cerebral)
+* [CycleJS](http://cycle.js.org/)
 
 ---
 
