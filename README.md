@@ -4,13 +4,13 @@
 
 **Highlights:**
 * (view-model) function is applied before handing model to a view
-* side-effects are handled in a different way: view triggers "events", "events" can trigger "commands".
-Events from a view flow into a non-pure (control) function which can 
-dispatch commands to a pure (reconcile) function which updates a model, i.e. the flow is:
+* side-effects are handled in a different way: "events" from a view flow into a side-effecty (control) function which can dispatch "commands" to a pure (reconcile) function which updates a model, i.e. the flow is:
 
-    model -> (view-model) -> (view) -event-> (control) -command-> (reconcile) -> model
+```
+model -> (view-model) -> (view) -event-> (control) -command-> (reconcile) -> model
+```
     
-* no addresses - communication is performed by calling explicit (dispatch) function
+* no addresses; communication is performed by calling explicit (dispatch) function
 * middleware can be added to any function; this is how logging of events and commands is implemented in examples
 * hot-reloading for free, thanks to Figwheel
 * *random-gif-list* uses Specter to update the nested model; compare it to more verbose "vanilla" updates in *counter-list*
