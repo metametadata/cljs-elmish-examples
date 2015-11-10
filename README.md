@@ -1,6 +1,6 @@
 ### My take at implementing Elm-ish architecture in ClojureScript using Reagent, core.match and Specter.
 
-**Demo:** http://metametadata.github.io/cljs-elmish-examples/
+[DEMO](http://metametadata.github.io/cljs-elmish-examples/)
 
 **Highlights:**
 * (view-model) function is applied before handing model to a view
@@ -59,6 +59,6 @@ To create a production build run:
 And open your browser in `resources/public/index.html`. You will not
 get live reloading, nor a REPL.
 
-To publish deploy a build:
+To deploy a build:
 
     ghp-import -p resources/public
