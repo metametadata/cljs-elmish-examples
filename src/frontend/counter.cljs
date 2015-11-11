@@ -25,12 +25,12 @@
          :decrement (dec model)))
 
 (defn view-model
-  "Given a model snapshot returns an immutable value for view to display."
+  "Pure function. Given a model snapshot returns an immutable value for view to display."
   [model]
   (str "#" model))
 
 (defn view
-  "View is given an immutable view-model and signal dispatching function."
+  "Pure function. View is given an immutable view-model and a signal dispatching function."
   [view-model dispatch]
   [:div
    [:button {:on-click #(dispatch :on-increment)} "+"]

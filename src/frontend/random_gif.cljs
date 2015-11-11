@@ -1,6 +1,6 @@
 (ns frontend.random-gif
   (:require [frontend.ui :as ui]
-            [ajax.core :as ajax]
+            [frontend.giphy-api :as giphy]
             [reagent.core :as r]
             [cljs.core.match :refer-macros [match]]))
 
@@ -10,19 +10,14 @@
   {:topic   topic
    :gif-url "https://media.giphy.com/media/bIvp5gwLq9MEo/giphy.gif"})
 
-(defn get-random-gif
-  "Async. Will eventually call (handler url) on success."
-  [topic handler]
-  (ajax/GET "http://api.giphy.com/v1/gifs/random"
-            {:params  {"api_key" "dc6zaTOxFJmzC"
-                       "tag"     topic}
-             :handler #(handler (get-in % ["data" "image_url"]))}))
-
-(defn control
-  [model signal dispatch]
-  (match signal
-         (:or :on-connect :on-request-more)
-         (get-random-gif (:topic model) #(dispatch [:set-new-gif %]))))
+(defn new-control
+  "Example of injecting external dependency."
+  [gif-fetcher]
+  (fn control
+    [model signal dispatch]
+    (match signal
+           (:or :on-connect :on-request-more)
+           (gif-fetcher (:topic model) #(dispatch [:set-new-gif %])))))
 
 (defn reconcile
   [model action]
@@ -46,7 +41,10 @@
 (defonce model (r/atom (init "funny cats")))
 (defn example
   []
-  (ui/connect model view-model view (ui/wrap-log-signals control) (ui/wrap-log-actions reconcile)))
+  (ui/connect model view-model view
+              (-> (new-control giphy/get-random-gif)
+                  ui/wrap-log-signals)
+              (ui/wrap-log-actions reconcile)))
 
 (defn example-view
   "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.

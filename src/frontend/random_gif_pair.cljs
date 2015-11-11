@@ -1,5 +1,6 @@
 (ns frontend.random-gif-pair
   (:require [frontend.ui :as ui]
+            [frontend.giphy-api :as giphy]
             [reagent.core :as r]
             [cljs.core.match :refer-macros [match]]
             [frontend.random-gif :as random-gif]))
@@ -9,19 +10,21 @@
   {:left  (random-gif/init topic-left)
    :right (random-gif/init topic-right)})
 
-(defn control
-  [model signal dispatch]
-  (match signal
-         :on-connect
-         (do
-           (random-gif/control (:left model) :on-connect (ui/tagged dispatch :left))
-           (random-gif/control (:right model) :on-connect (ui/tagged dispatch :right)))
+(defn new-control
+  [gif-fetcher]
+  (fn control
+    [model signal dispatch]
+    (match signal
+           :on-connect
+           (do
+             ((random-gif/new-control gif-fetcher) (:left model) :on-connect (ui/tagged dispatch :left))
+             ((random-gif/new-control gif-fetcher) (:right model) :on-connect (ui/tagged dispatch :right)))
 
-         [:left e]
-         (random-gif/control (:left model) e (ui/tagged dispatch :left))
+           [:left e]
+           ((random-gif/new-control gif-fetcher) (:left model) e (ui/tagged dispatch :left))
 
-         [:right e]
-         (random-gif/control (:right model) e (ui/tagged dispatch :right))))
+           [:right e]
+           ((random-gif/new-control gif-fetcher) (:right model) e (ui/tagged dispatch :right)))))
 
 (defn reconcile
   [model action]
@@ -46,7 +49,10 @@
 (defonce model (r/atom (init "funny cats" "funny dogs")))
 (defn example
   []
-  (ui/connect model view-model view (ui/wrap-log-signals control) (ui/wrap-log-actions reconcile)))
+  (ui/connect model view-model view
+              (-> (new-control giphy/get-random-gif)
+                  ui/wrap-log-signals)
+              (ui/wrap-log-actions reconcile)))
 
 (defn example-view
   "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.

@@ -27,6 +27,25 @@ frontend.core=> ((:dispatch-action counter-example) :increment)
     6 ->
     7
 ```
+* external dependencies can be easily injected into components by using closures; for instance, this is how 
+gif fetcher client is injected in *random-gif*:
+
+```
+(defn new-control
+  [gif-fetcher]
+  (fn control
+    [model signal dispatch]
+    (match signal
+           (:or :on-connect :on-request-more)
+           (gif-fetcher (:topic model) #(dispatch [:set-new-gif %])))))
+
+; ...
+(ui/connect model view-model view
+              (-> (new-control giphy/get-random-gif)
+                  ui/wrap-log-signals)
+              (ui/wrap-log-actions reconcile))
+```
+Now, when unit testing control behavior, it should be easy to stub async API code.
 
 ## Build
 
