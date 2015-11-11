@@ -44,6 +44,12 @@
           :src   (:gif-url view-model)}]])
 
 (defonce model (r/atom (init "funny cats")))
-(defn example-view
+(defn example
   []
-  [ui/connect model view-model view (ui/wrap-log-events control) (ui/wrap-log-commands reconcile)])
+  (ui/connect model view-model view (ui/wrap-log-events control) (ui/wrap-log-commands reconcile)))
+
+(defn example-view
+  "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.
+  In particalur, :on-connect will not be triggered on each reload."
+  []
+  (:view (example)))

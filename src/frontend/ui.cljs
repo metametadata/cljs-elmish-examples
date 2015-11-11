@@ -1,24 +1,27 @@
 ; GUI architecture API
 (ns frontend.ui
+  (:require [reagent.core :as r])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;; Core
 (defn connect
-  "Returns a new view. Model must be a ratom.
-
-  Data flow:
-  model -> view-model -> view -(dispatch event)-> control -(dispatch command)-> reconcile -(update)-> model
+  "Model must be a ratom.
+  Returns a map with :view, :dispatch-event, :dispatch-command.
+  Dispatch functions are exposed for use during debugging.
 
   Automatically fires :on-connect event.
-  "
-  [model view-model _view_ control reconcile]
-  ; dispatch functions don't return anything to make API even smaller
+
+  Data flow:
+  model -> (view-model) -> (view) -event-> (control) -command-> (reconcile) -> model"
+  [model view-model view control reconcile]
+  ; dispatch functions return nil to make API even smaller
   (let [dispatch-command (fn [c] (do (swap! model reconcile c) nil))
-        dispatch-event (fn [e] (do (control @model e dispatch-command) nil))]
+        dispatch-event (fn [e] (do (control @model e dispatch-command) nil))
+        connected-view (fn [] [view (view-model @model) dispatch-event])]
     (dispatch-event :on-connect)
-    (fn connected-view
-      [_model_ _view-model_ view _control_ _reconcile_]
-      [view (view-model @model) dispatch-event])))
+    {:view             connected-view
+     :dispatch-command dispatch-command
+     :dispatch-event   dispatch-event}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;; Utils
 (defn tagged
@@ -33,9 +36,9 @@
 (defn wrap-log-events
   [control]
   (fn wrapped-control
-    [model event command]
+    [model event dispatch]
     (println "event =" event)
-    (control model event command)))
+    (control model event dispatch)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;; Reconcile Middlewares
 (defn wrap-log-commands

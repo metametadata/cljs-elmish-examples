@@ -14,13 +14,17 @@
   [text]
   [:div {:style {:margin-left "2em" :margin-right "1em"}} text])
 
+; this var can be accessed from REPL
+(def counter-example (counter/example))
+
 (defn app-view
   []
   [:div {:style {:display "flex" :flex-direction "column" :flex-wrap "wrap"}}
    [:h3 "Counter"]
    [:div {:style {:display "flex" :flex-direction "row"}}
     [title "Single:"]
-    [counter/example-view]
+    [(:view counter-example)]
+
     [title "Pair:"]
     [counter-pair/example-view]]
 
@@ -28,6 +32,7 @@
    [:div {:style {:display "flex" :flex-direction "row"}}
     [title "Ordinary:"]
     [counter-list/example-view]
+
     [title "Fancy:"]
     [counter-list-fancy/example-view]]
 
@@ -35,6 +40,7 @@
    [:div {:style {:display "flex" :flex-direction "row"}}
     [title "Single:"]
     [random-gif/example-view]
+
     [title "Pair:"]
     [random-gif-pair/example-view]]
 

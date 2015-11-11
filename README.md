@@ -2,7 +2,7 @@
 
 [DEMO](http://metametadata.github.io/cljs-elmish-examples/)
 
-**Highlights:**
+## Highlights
 * (view-model) function is applied before handing model to a view
 * side-effects are handled in a different way: "events" from a view flow into a side-effecty (control) function which can dispatch "commands" to a pure (reconcile) function which updates a model, i.e. the flow is:
 
@@ -12,28 +12,22 @@ model -> (view-model) -> (view) -event-> (control) -command-> (reconcile) -> mod
     
 * no addresses; communication is performed by calling explicit (dispatch) function
 * middleware can be added to any function; this is how logging of events and commands is implemented in examples
-* hot-reloading for free, thanks to Figwheel
 * *random-gif-list* uses Specter to update the nested model; compare it to more verbose "vanilla" updates in *counter-list*
+* hot-reloading for free, thanks to Figwheel
+* it's possible to manually dispatch events and commands via Figwheel REPL and immediately see results in a browser:
+  
+```
+$ lein figwheel
+...
+cljs.user=> (ns frontend.core)
 
----
+frontend.core=> ((:dispatch-command counter-example) :increment)
+  command = :increment
+    9 ->
+    10
+```
 
-See original tutorial:
-https://github.com/evancz/elm-architecture-tutorial/
-
-Other implementations:
-* http://spin.atomicobject.com/2015/07/09/implementing-elm-architecture-clojurescript/
-* https://github.com/gaearon/react-elmish-example/
-* https://github.com/Gozala/reflex-react-driver/tree/master/examples
-
-Also take a look at these UI libs: 
-* [dominator](https://github.com/dubiousdavid/dominator)
-* [re-frame](https://github.com/Day8/re-frame)
-* [Om Next](https://github.com/omcljs/om/wiki/Quick-Start-(om.next))
-* [Redux](https://github.com/rackt/redux)
-* [Cerebral](https://github.com/christianalfoni/cerebral)
-* [CycleJS](http://cycle.js.org/)
-
----
+## Build
 
 To get an interactive development environment run:
 
@@ -59,6 +53,19 @@ To create a production build run:
 And open your browser in `resources/public/index.html`. You will not
 get live reloading, nor a REPL.
 
-To deploy a build:
+## References
+Original tutorial:
+https://github.com/evancz/elm-architecture-tutorial/
 
-    ghp-import -p resources/public
+Other implementations:
+* http://spin.atomicobject.com/2015/07/09/implementing-elm-architecture-clojurescript/
+* https://github.com/gaearon/react-elmish-example/
+* https://github.com/Gozala/reflex-react-driver/tree/master/examples
+
+Also take a look at these UI libs: 
+* [dominator](https://github.com/dubiousdavid/dominator)
+* [re-frame](https://github.com/Day8/re-frame)
+* [Om Next](https://github.com/omcljs/om/wiki/Quick-Start-(om.next))
+* [Redux](https://github.com/rackt/redux)
+* [Cerebral](https://github.com/christianalfoni/cerebral)
+* [CycleJS](http://cycle.js.org/)

@@ -39,15 +39,15 @@
    [:button {:on-click #(dispatch :on-decrement)} "-"]])
 
 (defn view-with-remove-button
-    "dispatch-on-remove is passed because it's up to container to decide how to handle removing."
-    [view-model {:keys [dispatch dispatch-on-remove] :as _context_}]
-    [:div
-     [:button {:on-click #(dispatch :on-increment)} "+"]
-     [:span view-model]
-     [:button {:on-click #(dispatch :on-decrement)} "-"]
-     [:button {:on-click #(dispatch-on-remove)} "X"]])
+  "dispatch-on-remove is passed because it's up to container to decide how to handle removing."
+  [view-model {:keys [dispatch dispatch-on-remove] :as _context_}]
+  [:div
+   [:button {:on-click #(dispatch :on-increment)} "+"]
+   [:span view-model]
+   [:button {:on-click #(dispatch :on-decrement)} "-"]
+   [:button {:on-click #(dispatch-on-remove)} "X"]])
 
 (defonce model (r/atom (init 1)))
-(defn example-view
+(defn example
   []
-  [ui/connect model view-model view (ui/wrap-log-events control) (ui/wrap-log-commands reconcile)])
+  (ui/connect model view-model view (ui/wrap-log-events control) (ui/wrap-log-commands reconcile)))
