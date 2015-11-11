@@ -85,7 +85,7 @@
        :placeholder "What kind of gifs do you want?"
        :value       (:topic view-model)
        :on-key-down #(when (is-enter-key? %) (dispatch :on-insert))
-       :on-input    #(dispatch [:on-input-topic (.. % -target -value)])
+       :on-change   #(dispatch [:on-input-topic (.. % -target -value)])
        }]
      remove
      [:hr]
