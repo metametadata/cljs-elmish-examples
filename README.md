@@ -30,7 +30,7 @@ frontend.core=> ((:dispatch-action counter-example) :increment)
 * external dependencies can be easily injected into components by using closures; for instance, this is how 
 gif fetcher client is injected in *random-gif*:
 
-```
+```clj
 (defn new-control
   [gif-fetcher]
   (fn control
@@ -44,8 +44,11 @@ gif fetcher client is injected in *random-gif*:
               (-> (new-control giphy/get-random-gif)
                   ui/wrap-log-signals)
               (ui/wrap-log-actions reconcile))
+
+; Pros: 
+; 1) when unit testing control behavior, it should be easy to stub async API code
+; 2) parent components will be able to inject a different API client (e.g. imgur one)
 ```
-Now, when unit testing control behavior, it should be easy to stub async API code.
 
 ## Build
 
