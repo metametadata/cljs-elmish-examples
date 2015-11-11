@@ -43,12 +43,12 @@
            (do
              (dispatch :insert)
              (gif-fetcher (:topic model)
-                          #((ui/tagged dispatch [:modify (:next-id model)])
+                          #((ui/tagged dispatch [:sub-action (:next-id model)])
                             [:set-new-gif %])))
 
            [[:on-sub-signal id] e]
            (update-gif model id
-                       (random-gif/new-control gif-fetcher) e (ui/tagged dispatch [:modify id])))))
+                       (random-gif/new-control nil) e (ui/tagged dispatch [:sub-action id])))))
 
 (defn reconcile
   [model action]
@@ -63,7 +63,7 @@
              (update :next-id inc)
              (assoc :topic ""))
 
-         [[:modify id] c]
+         [[:sub-action id] c]
          (update-gif model id random-gif/reconcile c)))
 
 (defn view-model

@@ -10,7 +10,7 @@
 
 (defn control
   "Non-pure signal handler.
-  Based on current model snapshot and received signal it can dispatch an action further to reconcile."
+  Based on current model snapshot and received signal it can dispatch actions further to reconcile."
   [_model_ signal dispatch]
   (match signal
          :on-connect nil

@@ -6,15 +6,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;; Core
 (defn connect
   "Model must be a ratom.
-  Returns a map with :view, :dispatch-signal, :dispatch-action.
-  Dispatch functions are exposed for use during debugging.
+  Returns a map with :view, :dispatch-signal, :dispatch-action (dispatch functions are exposed mainly for debugging).
 
   Automatically fires :on-connect signal.
 
   Data flow:
   model -> (view-model) -> (view) -signal-> (control) -action-> (reconcile) -> model"
   [model view-model view control reconcile]
-  ; dispatch functions return nil to make API even smaller
+  ; for now dispatch functions return nil to make API even smaller
   (let [dispatch-action (fn [a] (do (swap! model reconcile a) nil))
         dispatch-signal (fn [s] (do (control @model s dispatch-action) nil))
         connected-view (fn [] [view (view-model @model) dispatch-signal])]

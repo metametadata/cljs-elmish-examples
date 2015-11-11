@@ -46,7 +46,7 @@ gif fetcher client is injected in *random-gif*:
               (ui/wrap-log-actions reconcile))
 
 ; Pros: 
-; 1) when unit testing control behavior, it should be easy to stub async API code
+; 1) when unit testing control behavior it should be easy to stub async API code
 ; 2) parent components will be able to inject a different API client (e.g. imgur one)
 ```
 
