@@ -29,8 +29,8 @@
   (apply update-counters* model (constantly true) f args))
 
 (defn control
-  [model event dispatch]
-  (match event
+  [model signal dispatch]
+  (match signal
          :on-connect nil
          :on-insert (dispatch :insert)
          :on-remove (dispatch :remove)
@@ -40,8 +40,8 @@
                          counter/control e (ui/tagged dispatch [:modify id]))))
 
 (defn reconcile
-  [model command]
-  (match command
+  [model action]
+  (match action
          :insert
          (-> model
              (update :counters concat [[(:next-id model) (counter/init 0)]])
@@ -72,7 +72,7 @@
 (defonce model (r/atom (init)))
 (defn example
   []
-  (ui/connect model view-model view (ui/wrap-log-events control) (ui/wrap-log-commands reconcile)))
+  (ui/connect model view-model view (ui/wrap-log-signals control) (ui/wrap-log-actions reconcile)))
 
 (defn example-view
   "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.

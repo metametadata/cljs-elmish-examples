@@ -19,14 +19,14 @@
              :handler #(handler (get-in % ["data" "image_url"]))}))
 
 (defn control
-  [model event dispatch]
-  (match event
+  [model signal dispatch]
+  (match signal
          (:or :on-connect :on-request-more)
          (get-random-gif (:topic model) #(dispatch [:set-new-gif %]))))
 
 (defn reconcile
-  [model command]
-  (match command
+  [model action]
+  (match action
          [:set-new-gif url]
          (assoc model :gif-url url)))
 
@@ -46,7 +46,7 @@
 (defonce model (r/atom (init "funny cats")))
 (defn example
   []
-  (ui/connect model view-model view (ui/wrap-log-events control) (ui/wrap-log-commands reconcile)))
+  (ui/connect model view-model view (ui/wrap-log-signals control) (ui/wrap-log-actions reconcile)))
 
 (defn example-view
   "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.

@@ -4,27 +4,28 @@
 
 ## Highlights
 * (view-model) function is applied before handing model to a view
-* side-effects are handled in a different way: "events" from a view flow into a side-effecty (control) function which can dispatch "commands" to a pure (reconcile) function which updates a model, i.e. the flow is:
+* side-effects are handled in a different way: "signals" from a view flow into a side-effecty (control) function which 
+can dispatch "actions" to a pure (reconcile) function which updates a model, i.e. the flow is:
 
 ```
-model -> (view-model) -> (view) -event-> (control) -command-> (reconcile) -> model
+model -> (view-model) -> (view) -signal-> (control) -action-> (reconcile) -> model
 ```
     
 * no addresses; communication is performed by calling explicit (dispatch) function
-* middleware can be added to any function; this is how logging of events and commands is implemented in examples
+* middleware can be added to any function; this is how logging of signals and actions is implemented in examples
 * *random-gif-list* uses Specter to update the nested model; compare it to more verbose "vanilla" updates in *counter-list*
 * hot-reloading for free, thanks to Figwheel
-* it's possible to manually dispatch events and commands via Figwheel REPL and immediately see results in a browser:
+* it's possible to manually dispatch signals and actions via Figwheel REPL and immediately see results in a browser:
   
 ```
 $ lein figwheel
 ...
 cljs.user=> (ns frontend.core)
 
-frontend.core=> ((:dispatch-command counter-example) :increment)
-  command = :increment
-    9 ->
-    10
+frontend.core=> ((:dispatch-action counter-example) :increment)
+  action = :increment
+    6 ->
+    7
 ```
 
 ## Build
@@ -32,6 +33,10 @@ frontend.core=> ((:dispatch-command counter-example) :increment)
 To get an interactive development environment run:
 
     lein figwheel
+    
+or better:
+    
+    rlwrap lein figwheel
 
 and open your browser at [localhost:3449](http://localhost:3449/).
 This will auto compile and send all changes to the browser without the

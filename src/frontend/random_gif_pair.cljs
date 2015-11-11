@@ -10,8 +10,8 @@
    :right (random-gif/init topic-right)})
 
 (defn control
-  [model event dispatch]
-  (match event
+  [model signal dispatch]
+  (match signal
          :on-connect
          (do
            (random-gif/control (:left model) :on-connect (ui/tagged dispatch :left))
@@ -24,8 +24,8 @@
          (random-gif/control (:right model) e (ui/tagged dispatch :right))))
 
 (defn reconcile
-  [model command]
-  (match command
+  [model action]
+  (match action
          [:left c]
          (update model :left random-gif/reconcile c)
 
@@ -46,7 +46,7 @@
 (defonce model (r/atom (init "funny cats" "funny dogs")))
 (defn example
   []
-  (ui/connect model view-model view (ui/wrap-log-events control) (ui/wrap-log-commands reconcile)))
+  (ui/connect model view-model view (ui/wrap-log-signals control) (ui/wrap-log-actions reconcile)))
 
 (defn example-view
   "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.

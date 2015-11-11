@@ -29,8 +29,8 @@
   (apply update-gifs* model (constantly true) f args))
 
 (defn control
-  [model event dispatch]
-  (match event
+  [model signal dispatch]
+  (match signal
          :on-connect nil
 
          [:on-input-topic val]
@@ -43,13 +43,13 @@
                                       #((ui/tagged dispatch [:modify (:next-id model)])
                                         [:set-new-gif %])))
 
-         [[:on-sub-event id] e]
+         [[:on-sub-signal id] e]
          (update-gif model id
                      random-gif/control e (ui/tagged dispatch [:modify id]))))
 
 (defn reconcile
-  [model command]
-  (match command
+  [model action]
+  (match action
          [:set-topic val]
          (assoc model :topic val)
 
@@ -70,7 +70,7 @@
 
 (defn element-view
   [{:keys [id item]} dispatch]
-  [random-gif/view item (ui/tagged dispatch [:on-sub-event id])])
+  [random-gif/view item (ui/tagged dispatch [:on-sub-signal id])])
 
 (defn is-enter-key?
   [e]
@@ -94,7 +94,7 @@
 (defonce model (r/atom (init)))
 (defn example
   []
-  (ui/connect model view-model view (ui/wrap-log-events control) (ui/wrap-log-commands reconcile)))
+  (ui/connect model view-model view (ui/wrap-log-signals control) (ui/wrap-log-actions reconcile)))
 
 (defn example-view
   "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.

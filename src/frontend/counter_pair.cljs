@@ -10,16 +10,16 @@
    :bottom-counter (counter/init bottom)})
 
 (defn control
-  [model event dispatch]
-  (match event
+  [model signal dispatch]
+  (match signal
          :on-connect nil
          :on-reset (dispatch :reset)
          [:top e] (counter/control (:top-counter model) e (ui/tagged dispatch :top))
          [:bottom e] (counter/control (:bottom-counter model) e (ui/tagged dispatch :bottom))))
 
 (defn reconcile
-  [model command]
-  (match command
+  [model action]
+  (match action
          :reset (init 0 0)
          [:top c] (update model :top-counter counter/reconcile c)
          [:bottom c] (update model :bottom-counter counter/reconcile c)))
@@ -39,7 +39,7 @@
 (defonce model (r/atom (init 1 2)))
 (defn example
   []
-  (ui/connect model view-model view (ui/wrap-log-events control) (ui/wrap-log-commands reconcile)))
+  (ui/connect model view-model view (ui/wrap-log-signals control) (ui/wrap-log-actions reconcile)))
 
 (defn example-view
   "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.
