@@ -53,6 +53,10 @@ To create a production build run:
 And open your browser in `resources/public/index.html`. You will not
 get live reloading, nor a REPL.
 
+To deploy a build:
+ 
+    ghp-import -p resources/public
+
 ## References
 Original tutorial:
 https://github.com/evancz/elm-architecture-tutorial/
