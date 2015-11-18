@@ -2,6 +2,8 @@
 
 [DEMO](http://metametadata.github.io/cljs-elmish-examples/)
 
+Also take a look at my TodoMVC implementation using the same pattern [HERE](https://github.com/metametadata/cljs-elmish-todomvc).
+
 ## Highlights
 * (view-model) function is applied before handing model to a view
 * side-effects are handled in a different way: "signals" from a view flow into a side-effecty (control) function which 
