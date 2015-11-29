@@ -1,37 +1,36 @@
 (ns frontend.counter
   (:require [frontend.ui :as ui]
-            [cljs.core.match :refer-macros [match]]
-            [reagent.core :as r]))
+            [cljs.core.match :refer-macros [match]]))
 
-(defn init
-  "Creates a model intance."
-  [x]
+(defn -init
+  "Pure function. Creates a model intance."
+  [x _env_]
   x)
 
-(defn control
+(defn -control
   "Non-pure signal handler.
   Based on current model snapshot and received signal it can dispatch actions further to reconcile."
-  [_model_ signal dispatch]
+  [_model_ signal dispatch _env_]
   (match signal
          :on-connect nil
          :on-increment (dispatch :increment)
          :on-decrement (dispatch :decrement)))
 
-(defn reconcile
+(defn -reconcile
   "Pure function. It returns a new model based on current model snapshot and received action."
-  [model action]
+  [model action _env_]
   (match action
          :increment (inc model)
          :decrement (dec model)))
 
-(defn view-model
+(defn -view-model
   "Pure function. Given a model snapshot returns an immutable value for view to display."
-  [model]
+  [model _env_]
   (str "#" model))
 
-(defn view
+(defn -view
   "Pure function. View is given an immutable view-model and a signal dispatching function."
-  [view-model dispatch]
+  [view-model dispatch _env_]
   [:div
    [:button {:on-click #(dispatch :on-increment)} "+"]
    [:span view-model]
@@ -46,7 +45,15 @@
    [:button {:on-click #(dispatch :on-decrement)} "-"]
    [:button {:on-click #(dispatch-on-remove)} "X"]])
 
-(defonce model (r/atom (init 1)))
+(def counter
+    {:init       -init
+     :view-model -view-model
+     :view       -view
+     :control    -control
+     :reconcile  -reconcile})
+
 (defn example
   []
-  (ui/connect model view-model view (ui/wrap-log-signals control) (ui/wrap-log-actions reconcile)))
+  (-> counter
+      ui/wrap-log
+      (ui/connect-reagent {} 1)))

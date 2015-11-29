@@ -1,36 +1,33 @@
 (ns frontend.random-gif
   (:require [frontend.ui :as ui]
             [frontend.giphy-api :as giphy]
-            [reagent.core :as r]
             [cljs.core.match :refer-macros [match]]))
 
-(defn init
+(defn -init
   "Creates a gif with specified topic and waiting indicator."
-  [topic]
+  [topic _env_]
   {:topic   topic
    :gif-url "https://media.giphy.com/media/bIvp5gwLq9MEo/giphy.gif"})
 
-(defn new-control
-  "Example of injecting external dependency."
-  [gif-fetcher]
-  (fn control
-    [model signal dispatch]
-    (match signal
-           (:or :on-connect :on-request-more)
-           (gif-fetcher (:topic model) #(dispatch [:set-new-gif %])))))
+(defn -control
+  "Example of using external dependency passed in env."
+  [model signal dispatch env]
+  (match signal
+         (:or :on-connect :on-request-more)
+         ((:gif-fetcher env) (:topic model) #(dispatch [:set-new-gif %]))))
 
-(defn reconcile
-  [model action]
+(defn -reconcile
+  [model action _env_]
   (match action
          [:set-new-gif url]
          (assoc model :gif-url url)))
 
-(defn view-model
-  [model]
+(defn -view-model
+  [model _env_]
   (update model :topic str "!"))
 
-(defn view
-  [view-model dispatch]
+(defn -view
+  [view-model dispatch _env_]
   [:div
    [:div
     [:strong (:topic view-model)]
@@ -38,16 +35,23 @@
    [:img {:style {:width 150}
           :src   (:gif-url view-model)}]])
 
-(defonce model (r/atom (init "funny cats")))
+; requires :gif-fetcher
+(def random-gif
+  {:init       -init
+   :view-model -view-model
+   :view       -view
+   :control    -control
+   :reconcile  -reconcile})
+
 (defn example
   []
-  (ui/connect model view-model view
-              (-> (new-control giphy/get-random-gif)
-                  ui/wrap-log-signals)
-              (ui/wrap-log-actions reconcile)))
+  (-> random-gif
+      ui/wrap-log
+      (ui/connect-reagent {:gif-fetcher giphy/get-random-gif}
+                          "funny cats")))
 
 (defn example-view
   "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.
-  In particalur, :on-connect will not be triggered on each reload."
+  In particular, :on-connect will not be triggered on each reload."
   []
   (:view (example)))

@@ -1,48 +1,55 @@
 (ns frontend.counter-pair
   (:require [frontend.ui :as ui]
-            [frontend.counter :as counter]
-            [reagent.core :as r]
+            [frontend.counter :refer [counter]]
             [cljs.core.match :refer-macros [match]]))
 
-(defn init
-  [top bottom]
-  {:top-counter    (counter/init top)
-   :bottom-counter (counter/init bottom)})
+(defn -init
+  [top bottom env]
+  {:top-counter    ((:init counter) top env)
+   :bottom-counter ((:init counter) bottom env)})
 
-(defn control
-  [model signal dispatch]
+(defn -control
+  [model signal dispatch env]
   (match signal
          :on-connect nil
          :on-reset (dispatch :reset)
-         [:top e] (counter/control (:top-counter model) e (ui/tagged dispatch :top))
-         [:bottom e] (counter/control (:bottom-counter model) e (ui/tagged dispatch :bottom))))
+         [:top s] ((:control counter) (:top-counter model) s (ui/tagged dispatch :top) env)
+         [:bottom s] ((:control counter) (:bottom-counter model) s (ui/tagged dispatch :bottom) env)))
 
-(defn reconcile
-  [model action]
+(defn -reconcile
+  [model action env]
   (match action
-         :reset (init 0 0)
-         [:top c] (update model :top-counter counter/reconcile c)
-         [:bottom c] (update model :bottom-counter counter/reconcile c)))
+         :reset (-init 0 0 env)
+         [:top a] (update model :top-counter (:reconcile counter) a env)
+         [:bottom a] (update model :bottom-counter (:reconcile counter) a env)))
 
-(defn view-model
-  [model]
-  {:top-counter    (counter/view-model (:top-counter model))
-   :bottom-counter (counter/view-model (:bottom-counter model))})
+(defn -view-model
+  [model env]
+  {:top-counter    ((:view-model counter) (:top-counter model) env)
+   :bottom-counter ((:view-model counter) (:bottom-counter model) env)})
 
-(defn view
-  [view-model dispatch]
+(defn -view
+  [view-model dispatch env]
   [:div
-   [counter/view (:top-counter view-model) (ui/tagged dispatch :top)]
-   [counter/view (:bottom-counter view-model) (ui/tagged dispatch :bottom)]
+   [(:view counter) (:top-counter view-model) (ui/tagged dispatch :top) env]
+   [(:view counter) (:bottom-counter view-model) (ui/tagged dispatch :bottom) env]
    [:button {:on-click #(dispatch :on-reset)} "Reset"]])
 
-(defonce model (r/atom (init 1 2)))
+(def counter-pair
+  {:init       -init
+   :view-model -view-model
+   :view       -view
+   :control    -control
+   :reconcile  -reconcile})
+
 (defn example
   []
-  (ui/connect model view-model view (ui/wrap-log-signals control) (ui/wrap-log-actions reconcile)))
+  (-> counter-pair
+      ui/wrap-log
+      (ui/connect-reagent {} 1 2)))
 
 (defn example-view
   "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.
-  In particalur, :on-connect will not be triggered on each reload."
+  In particular, :on-connect will not be triggered on each reload."
   []
   (:view (example)))

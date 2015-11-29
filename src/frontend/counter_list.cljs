@@ -1,16 +1,15 @@
 (ns frontend.counter-list
   (:require [frontend.ui :as ui]
-            [frontend.counter :as counter]
-            [reagent.core :as r]
+            [frontend.counter :refer [counter]]
             [cljs.core.match :refer-macros [match]]))
 
-(defn init
-  []
+(defn -init
+  [_env_]
   {; list of [id counter-model] vectors
    :counters (list)
    :next-id  0})
 
-(defn update-counters*
+(defn -update-counters*
   "Applies a function of args [counter-model & args] to the counters specified by predicate.
   The function can have side-effects. Returns a new model."
   [model pred f & args]
@@ -20,62 +19,70 @@
               counter))]
     (update model :counters #(doall (map update-counter %)))))
 
-(defn update-counter
+(defn -update-counter
   [model id f & args]
-  (apply update-counters* model #(= id (first %)) f args))
+  (apply -update-counters* model #(= id (first %)) f args))
 
-(defn update-every-counter
+(defn -update-every-counter
   [model f & args]
-  (apply update-counters* model (constantly true) f args))
+  (apply -update-counters* model (constantly true) f args))
 
-(defn control
-  [model signal dispatch]
+(defn -control
+  [model signal dispatch env]
   (match signal
          :on-connect nil
          :on-insert (dispatch :insert)
          :on-remove (dispatch :remove)
 
-         [[:on-modify id] e]
-         (update-counter model id
-                         counter/control e (ui/tagged dispatch [:modify id]))))
+         [[:on-modify id] s]
+         (-update-counter model id
+                          (:control counter) s (ui/tagged dispatch [:modify id]) env)))
 
-(defn reconcile
-  [model action]
+(defn -reconcile
+  [model action env]
   (match action
          :insert
          (-> model
-             (update :counters concat [[(:next-id model) (counter/init 0)]])
+             (update :counters concat [[(:next-id model) ((:init counter) 0)]])
              (update :next-id inc))
 
          :remove
          (update model :counters rest)
 
-         [[:modify id] c]
-         (update-counter model id counter/reconcile c)))
+         [[:modify id] a]
+         (-update-counter model id (:reconcile counter) a env)))
 
-(defn view-model
-  [model]
-  (select-keys (update-every-counter model counter/view-model)
+(defn -view-model
+  [model env]
+  (select-keys (-update-every-counter model (:view-model counter) env)
                [:counters]))
 
-(defn view-counter
-  [[id view-model] dispatch]
-  [counter/view view-model (ui/tagged dispatch [:on-modify id])])
+(defn -view-counter
+  [[id view-model] dispatch env]
+  [(:view counter) view-model (ui/tagged dispatch [:on-modify id]) env])
 
-(defn view
-  [view-model dispatch]
-  (let [counters (map #(view-counter % dispatch) (:counters view-model))
+(defn -view
+  [view-model dispatch env]
+  (let [counters (map #(-view-counter % dispatch env) (:counters view-model))
         insert [:button {:on-click #(dispatch :on-insert)} "Insert"]
         remove [:button {:on-click #(dispatch :on-remove)} "Remove"]]
     (into [:div insert remove] counters)))
 
-(defonce model (r/atom (init)))
+(def counter-list
+  {:init       -init
+   :view-model -view-model
+   :view       -view
+   :control    -control
+   :reconcile  -reconcile})
+
 (defn example
   []
-  (ui/connect model view-model view (ui/wrap-log-signals control) (ui/wrap-log-actions reconcile)))
+  (-> counter-list
+      ui/wrap-log
+      (ui/connect-reagent {})))
 
 (defn example-view
   "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.
-  In particalur, :on-connect will not be triggered on each reload."
+  In particular, :on-connect will not be triggered on each reload."
   []
   (:view (example)))

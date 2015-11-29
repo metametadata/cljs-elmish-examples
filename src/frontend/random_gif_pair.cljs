@@ -1,61 +1,65 @@
 (ns frontend.random-gif-pair
   (:require [frontend.ui :as ui]
+            [frontend.random-gif :refer [random-gif]]
             [frontend.giphy-api :as giphy]
-            [reagent.core :as r]
-            [cljs.core.match :refer-macros [match]]
-            [frontend.random-gif :as random-gif]))
+            [cljs.core.match :refer-macros [match]]))
 
-(defn init
-  [topic-left topic-right]
-  {:left  (random-gif/init topic-left)
-   :right (random-gif/init topic-right)})
+(defn -init
+  [topic-left topic-right env]
+  {:left  ((:init random-gif) topic-left env)
+   :right ((:init random-gif) topic-right env)})
 
-(defn new-control
-  [gif-fetcher]
-  (fn control
-    [model signal dispatch]
-    (match signal
-           :on-connect
-           (do
-             ((random-gif/new-control gif-fetcher) (:left model) :on-connect (ui/tagged dispatch :left))
-             ((random-gif/new-control gif-fetcher) (:right model) :on-connect (ui/tagged dispatch :right)))
+(defn -control
+  [model signal dispatch env]
+  (match signal
+         :on-connect
+         (do
+           ((:control random-gif) (:left model) :on-connect (ui/tagged dispatch :left) env)
+           ((:control random-gif) (:right model) :on-connect (ui/tagged dispatch :right) env))
 
-           [:left e]
-           ((random-gif/new-control gif-fetcher) (:left model) e (ui/tagged dispatch :left))
+         [:left s]
+         ((:control random-gif) (:left model) s (ui/tagged dispatch :left) env)
 
-           [:right e]
-           ((random-gif/new-control gif-fetcher) (:right model) e (ui/tagged dispatch :right)))))
+         [:right s]
+         ((:control random-gif) (:right model) s (ui/tagged dispatch :right) env)))
 
-(defn reconcile
-  [model action]
+(defn -reconcile
+  [model action env]
   (match action
-         [:left c]
-         (update model :left random-gif/reconcile c)
+         [:left a]
+         (update model :left (:reconcile random-gif) a env)
 
-         [:right c]
-         (update model :right random-gif/reconcile c)))
+         [:right a]
+         (update model :right (:reconcile random-gif) a env)))
 
-(defn view-model
-  [model]
-  {:left  (random-gif/view-model (:left model))
-   :right (random-gif/view-model (:right model))})
+(defn -view-model
+  [model env]
+  {:left  ((:view-model random-gif) (:left model) env)
+   :right ((:view-model random-gif) (:right model) env)})
 
-(defn view
-  [view-model dispatch]
+(defn -view
+  [view-model dispatch env]
   [:div {:style {:display "flex"}}
-   [random-gif/view (:left view-model) (ui/tagged dispatch :left)]
-   [random-gif/view (:right view-model) (ui/tagged dispatch :right)]])
+   [(:view random-gif) (:left view-model) (ui/tagged dispatch :left) env]
+   [(:view random-gif) (:right view-model) (ui/tagged dispatch :right) env]])
 
-(defonce model (r/atom (init "funny cats" "funny dogs")))
+; requires :gif-fetcher
+(def random-gif-pair
+  {:init       -init
+   :view-model -view-model
+   :view       -view
+   :control    -control
+   :reconcile  -reconcile})
+
 (defn example
   []
-  (ui/connect model view-model view
-              (-> (new-control giphy/get-random-gif)
-                  ui/wrap-log-signals)
-              (ui/wrap-log-actions reconcile)))
+  (-> random-gif-pair
+      ui/wrap-log
+      (ui/connect-reagent {:gif-fetcher giphy/get-random-gif}
+                          "funny cats" "funny dogs")))
 
 (defn example-view
   "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.
-  In particalur, :on-connect will not be triggered on each reload."
+  In particular, :on-connect will not be triggered on each reload."
   []
   (:view (example)))

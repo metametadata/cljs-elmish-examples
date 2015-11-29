@@ -1,26 +1,43 @@
 ; GUI architecture API
 (ns frontend.ui
-  (:require [reagent.core :as r])
-  (:require-macros [reagent.ratom :refer [reaction]]))
+  (:require [reagent.core :as r]
+            [cljs.pprint]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;; Core
-(defn connect
-  "Model must be a ratom.
-  Returns a map with :view, :dispatch-signal, :dispatch-action (dispatch functions are exposed mainly for debugging).
+(defn connect-reagent
+  "Given a component spec map returns a connected component which can be rendered using Reagent.
 
-  Automatically fires :on-connect signal.
+  :control can be a non-pure function, :init, :view-model, :view and :reconcile must be pure functions.
+
+  Environment map will be passed to all functions, so it can be used to inject external dependencies.
+  init-args will be passed to :init function.
+
+  Dispatches :on-connect signal and returns a map with:
+      :view (Reagent view function),
+      :dispatch-signal (it can be used to dispatch signals not only from the view),
+      :model ratom (this is exposed mainly for debugging),
+      :dispatch-action (this is exposed mainly for debugging).
 
   Data flow:
-  model -> (view-model) -> (view) -signal-> (control) -action-> (reconcile) -> model"
-  [model view-model view control reconcile]
-  ; for now dispatch functions return nil to make API even smaller
-  (let [dispatch-action (fn [a] (do (swap! model reconcile a) nil))
-        dispatch-signal (fn [s] (do (control @model s dispatch-action) nil))
-        connected-view (fn [] [view (view-model @model) dispatch-signal])]
-    (dispatch-signal :on-connect)
-    {:view            connected-view
-     :dispatch-action dispatch-action
-     :dispatch-signal dispatch-signal}))
+  (init)
+  |
+  V
+  model -> (view-model) -> (view) -signal-> (control) -action-> (reconcile) -> model -> etc."
+  [{:as _spec_ :keys [init view-model view control reconcile]}
+   env
+   & init-args]
+  (let [model (apply init (concat init-args [env]))
+        model-ratom (r/atom model)]
+    ; for now dispatch functions return nil to make API even smaller
+    (letfn [(dispatch-action [action] (swap! model-ratom reconcile action env) nil)
+            (dispatch-signal [signal] (control @model-ratom signal dispatch-action env) nil)
+            (reagent-view [] [view (view-model @model-ratom env) dispatch-signal env])]
+      (dispatch-signal :on-connect)
+
+      {:view            reagent-view
+       :dispatch-signal dispatch-signal
+       :model           model-ratom
+       :dispatch-action dispatch-action})))
 
 ;;;;;;;;;;;;;;;;;;;;;;;; Utils
 (defn tagged
@@ -31,20 +48,20 @@
     [x]
     (f [tag x])))
 
-;;;;;;;;;;;;;;;;;;;;;;;; Control Middlewares
-(defn wrap-log-signals
-  [control]
-  (fn wrapped-control
-    [model signal dispatch]
-    (println "signal =" signal)
-    (control model signal dispatch)))
-
-;;;;;;;;;;;;;;;;;;;;;;;; Reconcile Middlewares
-(defn wrap-log-actions
-  [reconcile]
-  (fn wrapped-reconcile
-    [model action]
-    (println "  action =" action)
-    (let [result (reconcile model action)]
-      (println "   " model "->\n   " result)
-      result)))
+;;;;;;;;;;;;;;;;;;;;;;;; Middleware
+(defn wrap-log
+  [spec]
+  (-> spec
+      (update :control #(fn control
+                         [model signal dispatch env]
+                         (println "signal =" signal)
+                         (println "   " model)
+                         (% model signal dispatch env)))
+      (update :reconcile #(fn reconcile
+                           [model action env]
+                           (println "  action =" action)
+                           (let [result (% model action env)]
+                             ;(println "   " model)
+                             ;(println "     ->")
+                             ;(println "   " result)
+                             result)))))
