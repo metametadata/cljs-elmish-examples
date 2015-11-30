@@ -48,7 +48,7 @@
 
            [[:on-sub-signal id] e]
            (update-gif model id
-                       (random-gif/new-control nil) e (ui/tagged dispatch [:sub-action id])))))
+                       (random-gif/new-control gif-fetcher) e (ui/tagged dispatch [:sub-action id])))))
 
 (defn reconcile
   [model action]
