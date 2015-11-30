@@ -9,7 +9,7 @@
 
   :control can be a non-pure function, :init, :view-model, :view and :reconcile must be pure functions.
 
-  Environment map will be passed to all functions, so it can be used to inject external dependencies.
+  env map will be passed to all functions as a last arg, so it can be used to inject external dependencies.
   init-args will be passed to :init function.
 
   Dispatches :on-connect signal and returns a map with:

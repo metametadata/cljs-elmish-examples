@@ -40,7 +40,7 @@
          (do
            (dispatch :insert)
 
-           ; TODO: it's better to [somehow] dispatch :on-connect to created gif
+           ; TODO: it's better to [somehow] dispatch :on-connect to created gif?
            ((:gif-fetcher env)
              (:topic model)
              #((ui/tagged dispatch [:sub-action (:next-id model)]) [:set-new-gif %])))
