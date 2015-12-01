@@ -34,11 +34,13 @@
     [model signal dispatch env]
     (match signal
            :on-connect nil
+
            :on-insert
            ; TODO: also send :on-connect to item
            (dispatch :insert)
 
-           ; TODO: remove item
+           [:on-remove id]
+           (dispatch [:remove id])
 
            [[:on-item-signal id] s]
            (-update-item model id
@@ -55,6 +57,9 @@
                  (update :items concat [{:id (:next-id model) :item new-item}])
                  (update :next-id inc)))
 
+           [:remove id]
+           (update model :items #(filter (fn [item] (not= (:id item) id)) %))
+
            [[:item-action id] a]
            (-update-item model id (:reconcile item-spec) a env))))
 
@@ -67,7 +72,10 @@
 
 (defn -item-views
   [items dispatch env item-spec]
-  (map #(-> [(:view item-spec) (:item %) (ui/tagged dispatch [:on-item-signal (:id %)]) env])
+  (map (fn [{:keys [id item]}]
+         [:div {:style {:display "flex" :flex-direction "row"}}
+          [(:view item-spec) item (ui/tagged dispatch [:on-item-signal id]) env]
+          [:button {:on-click #(dispatch [:on-remove id])} "X"]])
        items))
 
 (defn -new-view
