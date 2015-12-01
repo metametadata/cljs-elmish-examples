@@ -49,7 +49,7 @@
    [:div
     [random-gif-list/example-view]]
 
-   [:h3 "Generic list of counters"]
+   [:h3 "List of lists"]
    [:div
     [generic-list/example-view]]])
 

@@ -4,7 +4,9 @@
             [cljs.core.match :refer-macros [match]]
             [com.rpl.specter :as s]
 
-            [frontend.counter :refer [counter]]))
+            [frontend.counter :refer [counter]]
+            [frontend.random-gif :refer [random-gif]]
+            [frontend.giphy-api :as giphy]))
 
 (defn -init
   [_env_]
@@ -36,8 +38,14 @@
            :on-connect nil
 
            :on-insert
-           ; TODO: also send :on-connect to item
            (dispatch :insert)
+
+           ; pattern does not allow sending :on-connect to new item from :on-insert
+           ; (because we can't get a new model after dispatching an action),
+           ; so this special signal should be explicitly dispatched after insertion
+           [:on-connect-item id]
+           ; we call self here only to get rid of code duplication
+           (control model [[:on-item-signal id] :on-connect] dispatch env)
 
            [:on-remove id]
            (dispatch [:remove id])
@@ -68,7 +76,7 @@
   (fn view-model
     [model env]
     (select-keys (-update-every-item model (:view-model item-spec) env)
-                 [:items])))
+                 [:items :next-id])))
 
 (defn -item-views
   [items dispatch env item-spec]
@@ -83,7 +91,8 @@
   (fn -view
     [view-model dispatch env]
     (let [items (-item-views (:items view-model) dispatch env item-spec)
-          insert [:button {:on-click #(dispatch :on-insert)} "Insert"]]
+          insert [:button {:on-click #(do (dispatch :on-insert)
+                                          (dispatch [:on-connect-item (:next-id view-model)]))} "Insert"]]
       (into [:div insert] items))))
 
 (defn new-list
@@ -97,9 +106,9 @@
 
 (defn example
   []
-  (-> (new-list counter 1)
+  (-> (new-list (new-list random-gif "nature"))
       ui/wrap-log
-      (ui/connect-reagent {})))
+      (ui/connect-reagent {:gif-fetcher giphy/get-random-gif})))
 
 (defn example-view
   "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.
