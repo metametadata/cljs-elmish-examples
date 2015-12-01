@@ -21,33 +21,33 @@
 (defn app-view
   []
   [:div {:style {:display "flex" :flex-direction "column" :flex-wrap "wrap"}}
-   ;[:h3 "Counter"]
-   ;[:div {:style {:display "flex" :flex-direction "row"}}
-   ; [title "Single:"]
-   ; [(:view counter-example)]
-   ;
-   ; [title "Pair:"]
-   ; [counter-pair/example-view]]
-   ;
-   ;[:h3 "Counter list"]
-   ;[:div {:style {:display "flex" :flex-direction "row"}}
-   ; [title "Ordinary:"]
-   ; [counter-list/example-view]
-   ;
-   ; [title "Fancy:"]
-   ; [counter-list-fancy/example-view]]
-   ;
-   ;[:h3 "Random GIF"]
-   ;[:div {:style {:display "flex" :flex-direction "row"}}
-   ; [title "Single:"]
-   ; [random-gif/example-view]
-   ;
-   ; [title "Pair:"]
-   ; [random-gif-pair/example-view]]
-   ;
-   ;[:h3 "Random GIF list"]
-   ;[:div
-   ; [random-gif-list/example-view]]
+   [:h3 "Counter"]
+   [:div {:style {:display "flex" :flex-direction "row"}}
+    [title "Single:"]
+    [(:view counter-example)]
+
+    [title "Pair:"]
+    [counter-pair/example-view]]
+
+   [:h3 "Counter list"]
+   [:div {:style {:display "flex" :flex-direction "row"}}
+    [title "Ordinary:"]
+    [counter-list/example-view]
+
+    [title "Fancy:"]
+    [counter-list-fancy/example-view]]
+
+   [:h3 "Random GIF"]
+   [:div {:style {:display "flex" :flex-direction "row"}}
+    [title "Single:"]
+    [random-gif/example-view]
+
+    [title "Pair:"]
+    [random-gif-pair/example-view]]
+
+   [:h3 "Random GIF list"]
+   [:div
+    [random-gif-list/example-view]]
 
    [:h3 "Generic list of counters"]
    [:div

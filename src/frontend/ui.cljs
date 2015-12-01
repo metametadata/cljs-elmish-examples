@@ -55,7 +55,6 @@
       (update :control #(fn control
                          [model signal dispatch env]
                          (println "signal =" signal)
-                         (println "   " model)
                          (% model signal dispatch env)))
       (update :reconcile #(fn reconcile
                            [model action env]
@@ -63,5 +62,5 @@
                            (let [result (% model action env)]
                              ;(println "   " model)
                              ;(println "     ->")
-                             ;(println "   " result)
+                             (println "   " result)
                              result)))))
