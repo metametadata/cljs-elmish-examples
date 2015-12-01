@@ -59,13 +59,13 @@
 (defn -view-counter
   [[id view-model] dispatch]
   [frontend.counter/view-with-remove-button view-model {:dispatch           (ui/tagged dispatch [:on-modify id])
-                                                         :dispatch-on-remove #(dispatch [:on-remove id])}])
+                                                        :dispatch-on-remove #(dispatch [:on-remove id])}])
 
 (defn -view
-  [view-model dispatch]
+  [view-model dispatch _env_]
   (let [counters (map #(-view-counter % dispatch) (:counters view-model))
         insert [:button {:on-click #(dispatch :on-insert)} "Insert"]]
-    (into [:div insert remove] counters)))
+    (into [:div insert] counters)))
 
 (def counter-list-fancy
   {:init       -init
