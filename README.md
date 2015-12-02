@@ -2,17 +2,21 @@
 
 [DEMO](http://metametadata.github.io/cljs-elmish-examples/)
 
+Also take a look at my TodoMVC implementation using the same pattern [HERE](https://github.com/metametadata/cljs-elmish-todomvc).
+
 ## Highlights
 * (view-model) function is applied before handing model to a view
 * side-effects are handled in a different way: "signals" from a view flow into a side-effecty (control) function which 
 can dispatch "actions" to a pure (reconcile) function which updates a model, i.e. the flow is:
 
 ```
-model -> (view-model) -> (view) -signal-> (control) -action-> (reconcile) -> model
+(init)
+  |
+  V
+model -> (view-model) -> (view) -signal-> (control) -action-> (reconcile) -> model -> etc.
 ```
     
 * no addresses; communication is performed by calling explicit (dispatch) function
-* middleware can be added to any function; this is how logging of signals and actions is implemented in examples
 * *random-gif-list* uses Specter to update the nested model; compare it to more verbose "vanilla" updates in *counter-list*
 * hot-reloading for free, thanks to Figwheel
 * it's possible to manually dispatch signals and actions via Figwheel REPL and immediately see results in a browser:
@@ -24,8 +28,21 @@ cljs.user=> (ns frontend.core)
 
 frontend.core=> ((:dispatch-action counter-example) :increment)
 ```
-* external dependencies can be easily injected into components by using closures; for instance, this is how 
-gif fetcher client is injected in *random-gif*:
+* component functions (init, view-model, view, control, reconcile) can passed around in "spec" maps for easier 
+middleware wrapping and using in generic components:
+
+```clj
+; logged list of lists of gifs
+(-> (generic-list/new-spec
+      (generic-list/new-spec
+        (random-gif/new-spec giphy/get-random-gif)
+        "nature"))
+    ui/wrap-log)      
+```
+* example models are persisted per Figwheel session by using *persistence-middleware*, 
+so that on hot-reloading the models are not reset to initial state (but reloading the browser tab will reset the models)
+ * external dependencies can be easily injected into components by using closures and spec factories; 
+for instance, this is how gif fetcher client is injected in *random-gif*:
 
 ```clj
 (defn new-control
@@ -36,15 +53,21 @@ gif fetcher client is injected in *random-gif*:
            (:or :on-connect :on-request-more)
            (gif-fetcher (:topic model) #(dispatch [:set-new-gif %])))))
 
+(defn new-spec
+  [gif-fetcher]
+  {:init       init
+   :view-model view-model
+   :view       view
+   :control    (new-control gif-fetcher)
+   :reconcile  reconcile})
+
 ; ...
-(ui/connect model view-model view
-              (-> (new-control giphy/get-random-gif)
-                  ui/wrap-log-signals)
-              (ui/wrap-log-actions reconcile))
+
+(ui/connect-reagent (new-spec giphy/get-random-gif) ["funny cats"])
 
 ; Pros: 
 ; 1) when unit testing control behavior it should be easy to stub async API code
-; 2) parent components will be able to inject a different API client (e.g. imgur one)
+; 2) parent components will be able to inject a different API client (e.g. Imgur one)
 ```
 
 ## Build
