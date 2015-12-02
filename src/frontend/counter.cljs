@@ -1,6 +1,5 @@
 (ns frontend.counter
-  (:require [frontend.ui :as ui]
-            [cljs.core.match :refer-macros [match]]))
+  (:require [cljs.core.match :refer-macros [match]]))
 
 (defn init
   "Pure function. Creates a model intance."
@@ -51,9 +50,3 @@
    :view       view
    :control    control
    :reconcile  reconcile})
-
-(defn example
-  []
-  (-> spec
-      ui/wrap-log
-      (ui/connect-reagent 1)))

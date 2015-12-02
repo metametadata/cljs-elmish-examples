@@ -23,9 +23,6 @@ $ lein figwheel
 cljs.user=> (ns frontend.core)
 
 frontend.core=> ((:dispatch-action counter-example) :increment)
-  action = :increment
-    6 ->
-    7
 ```
 * external dependencies can be easily injected into components by using closures; for instance, this is how 
 gif fetcher client is injected in *random-gif*:

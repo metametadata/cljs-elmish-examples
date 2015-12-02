@@ -74,15 +74,3 @@
    :view       view
    :control    control
    :reconcile  reconcile})
-
-(defn example
-  []
-  (-> spec
-      ui/wrap-log
-      ui/connect-reagent))
-
-(defn example-view
-  "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.
-  In particular, :on-connect will not be triggered on each reload."
-  []
-  (:view (example)))

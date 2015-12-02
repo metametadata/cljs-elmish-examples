@@ -22,8 +22,8 @@
   |
   V
   model -> (view-model) -> (view) -signal-> (control) -action-> (reconcile) -> model -> etc."
-  [{:as _spec_ :keys [init view-model view control reconcile]}
-   & init-args]
+  [{:keys [init view-model view control reconcile] :as _spec_}
+   init-args]
   (let [model (apply init init-args)
         model-ratom (r/atom model)]
     ; for now dispatch functions return nil to make API even smaller

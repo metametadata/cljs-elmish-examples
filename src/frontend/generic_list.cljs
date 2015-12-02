@@ -2,10 +2,7 @@
 (ns frontend.generic-list
   (:require [frontend.ui :as ui]
             [cljs.core.match :refer-macros [match]]
-            [com.rpl.specter :as s]
-
-            [frontend.random-gif :as random-gif]
-            [frontend.giphy-api :as giphy]))
+            [com.rpl.specter :as s]))
 
 (defn init
   []
@@ -102,15 +99,3 @@
    :view       (new-view item-spec)
    :control    (new-control item-spec)
    :reconcile  (new-reconcile item-spec item-init-args)})
-
-(defn example
-  []
-  (-> (new-spec (new-spec (random-gif/new-spec giphy/get-random-gif) "nature"))
-      ui/wrap-log
-      ui/connect-reagent))
-
-(defn example-view
-  "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.
-  In particular, :on-connect will not be triggered on each reload."
-  []
-  (:view (example)))
