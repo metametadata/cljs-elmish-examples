@@ -1,10 +1,8 @@
 (ns frontend.counter
-  (:require [frontend.ui :as ui]
-            [cljs.core.match :refer-macros [match]]
-            [reagent.core :as r]))
+  (:require [cljs.core.match :refer-macros [match]]))
 
 (defn init
-  "Creates a model intance."
+  "Pure function. Creates a model intance."
   [x]
   x)
 
@@ -46,7 +44,9 @@
    [:button {:on-click #(dispatch :on-decrement)} "-"]
    [:button {:on-click #(dispatch-on-remove)} "X"]])
 
-(defonce model (r/atom (init 1)))
-(defn example
-  []
-  (ui/connect model view-model view (ui/wrap-log-signals control) (ui/wrap-log-actions reconcile)))
+(def spec
+  {:init       init
+   :view-model view-model
+   :view       view
+   :control    control
+   :reconcile  reconcile})

@@ -23,13 +23,15 @@
 
 (defprotocol Handler
   (active? [h] "returns true if has callback. Must work w/o lock")
+  (blockable? [h] "returns true if this handler may be blocked, otherwise it must not block")
   #_(lock-id [h] "a unique id for lock acquisition order, 0 if no lock")
   (commit [h] "commit to fulfilling its end of the transfer, returns cb. Must be called within lock"))
 
 (defprotocol Buffer
-  (full? [b])
-  (remove! [b])
-  (add!* [b itm]))
+  (full? [b] "returns true if buffer can accept put")
+  (remove! [b] "remove and return next item from buffer, called under chan mutex")
+  (add!* [b itm] "if room, add item to the buffer, returns b, called under chan mutex")
+  (close-buf! [b] "called on chan closed under chan mutex, return ignored"))
 
 (defn add!
   ([b] b)

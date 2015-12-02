@@ -226,7 +226,7 @@
                      (path-parts (fix-node-request-url request-url))))]
           (aset (.-cache js/require) cache-path nil)
           (callback (try
-                      (js/require (string/join "/" ["." ".." request-url]))
+                      (js/require cache-path)
                       (catch js/Error e
                         (utils/log :error (str  "Figwheel: Error loading file " cache-path))
                         (utils/log :error (.-stack e))
@@ -350,8 +350,10 @@
              deps))))
 
 (defn sort-files [files]
-  (let [keep-files (set (keep :namespace files))]
-    (filter (comp keep-files :namespace) (expand-files files))))
+  (if (<= (count files) 1) ;; no need to sort if only one
+    files
+    (let [keep-files (set (keep :namespace files))]
+      (filter (comp keep-files :namespace) (expand-files files)))))
 
 (defn get-figwheel-always []
   (map (fn [[k v]] {:namespace k :type :namespace})

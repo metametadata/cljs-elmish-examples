@@ -315,12 +315,25 @@ goog.Promise.returnEntry_ = function(entry) {
 };
 
 
+// NOTE: this is the same template expression as is used for
+// goog.IThenable.prototype.then
+
+
 /**
- * @param {(TYPE|goog.Thenable<TYPE>|Thenable)=} opt_value
- * @return {!goog.Promise<TYPE>} A new Promise that is immediately resolved
+ * @param {VALUE=} opt_value
+ * @return {RESULT} A new Promise that is immediately resolved
  *     with the given value. If the input value is already a goog.Promise, it
  *     will be returned immediately without creating a new instance.
- * @template TYPE
+ * @template VALUE
+ * @template RESULT := type('goog.Promise',
+ *     cond(isUnknown(VALUE), unknown(),
+ *       mapunion(VALUE, (V) =>
+ *         cond(isTemplatized(V) && sub(rawTypeOf(V), 'IThenable'),
+ *           templateTypeOf(V, 0),
+ *           cond(sub(V, 'Thenable'),
+ *              unknown(),
+ *              V)))))
+ * =:
  */
 goog.Promise.resolve = function(opt_value) {
   if (opt_value instanceof goog.Promise) {
@@ -927,10 +940,10 @@ goog.Promise.prototype.resolve_ = function(state, x) {
  * Invokes the "then" method of an input value if that value is a Thenable. This
  * is a no-op if the value is not thenable.
  *
- * @param {*} value A potentially thenable value.
+ * @param {?} value A potentially thenable value.
  * @param {!Function} onFulfilled
  * @param {!Function} onRejected
- * @param {*} context
+ * @param {?} context
  * @return {boolean} Whether the input value was thenable.
  * @private
  */

@@ -86,6 +86,7 @@
   (add!* [this itm]
     (.unbounded-unshift buf itm)
     this)
+  (close-buf! [this])
   cljs.core/ICounted
   (-count [this]
     (.-length buf)))
@@ -104,6 +105,7 @@
     (when-not (== (.-length buf) n)
       (.unshift buf itm))
     this)
+  (close-buf! [this])
   cljs.core/ICounted
   (-count [this]
     (.-length buf)))
@@ -123,9 +125,35 @@
       (impl/remove! this))
     (.unshift buf itm)
     this)
+  (close-buf! [this])
   cljs.core/ICounted
   (-count [this]
     (.-length buf)))
 
 (defn sliding-buffer [n]
   (SlidingBuffer. (ring-buffer n) n))
+
+(defonce ^:private NO-VAL (js/Object.))
+(defn- undelivered? [val]
+  (identical? NO-VAL val))
+
+(deftype PromiseBuffer [^:mutable val]
+  impl/UnblockingBuffer
+  impl/Buffer
+  (full? [_]
+    false)
+  (remove! [_]
+    val)
+  (add!* [this itm]
+    (when (undelivered? val)
+      (set! val itm))
+    this)
+  (close-buf! [_]
+    (when (undelivered? val)
+      (set! val nil)))
+  cljs.core/ICounted
+  (-count [_]
+    (if (undelivered? val) 0 1)))
+
+(defn promise-buffer []
+  (PromiseBuffer. NO-VAL))

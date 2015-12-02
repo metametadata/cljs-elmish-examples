@@ -284,6 +284,8 @@
                        (if (utils/html-env?) js/location.host "localhost:3449")
                        "/figwheel-ws")
    :load-warninged-code false
+
+   ;; :on-message identity
    
    :on-jsload default-on-jsload
    :before-jsload default-before-load
@@ -317,7 +319,7 @@
               :comp-fail-warning-plugin compile-fail-warning-plugin
               :css-reloader-plugin      css-reloader-plugin
               :repl-plugin      repl-plugin}
-       base  (if (not (utils/html-env?)) ;; we are in an html environment?
+        base  (if (not (utils/html-env?)) ;; we are in an html environment?
                (select-keys base [#_:enforce-project-plugin
                                   :file-reloader-plugin
                                   :comp-fail-warning-plugin
@@ -330,6 +332,11 @@
              (utils/html-env?))
       (assoc base :heads-up-display-plugin heads-up-plugin)
       base)))
+
+(defn add-message-watch [key callback]
+  (add-watch
+   socket/message-history-atom key
+   (fn [_ _ _ msg-hist] (callback (first msg-hist)))))
 
 (defn add-plugins [plugins system-options]
   (doseq [[k plugin] plugins]

@@ -27,6 +27,7 @@
   (reify
    impl/Handler
    (active? [_] true)
+   (blockable? [_] true)
    (commit [_] f)))
 
 
@@ -91,7 +92,8 @@
 
      (and exception
           catch-block
-          (instance? catch-exception exception))
+          (or (= :default catch-exception)
+              (instance? catch-exception exception)))
      (ioc/aset-all! state
                     STATE-IDX
                     catch-block

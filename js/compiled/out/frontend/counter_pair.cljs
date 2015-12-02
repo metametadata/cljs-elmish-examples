@@ -1,7 +1,6 @@
 (ns frontend.counter-pair
   (:require [frontend.ui :as ui]
             [frontend.counter :as counter]
-            [reagent.core :as r]
             [cljs.core.match :refer-macros [match]]))
 
 (defn init
@@ -14,15 +13,15 @@
   (match signal
          :on-connect nil
          :on-reset (dispatch :reset)
-         [:top e] (counter/control (:top-counter model) e (ui/tagged dispatch :top))
-         [:bottom e] (counter/control (:bottom-counter model) e (ui/tagged dispatch :bottom))))
+         [:top s] (counter/control (:top-counter model) s (ui/tagged dispatch :top))
+         [:bottom s] (counter/control (:bottom-counter model) s (ui/tagged dispatch :bottom))))
 
 (defn reconcile
   [model action]
   (match action
          :reset (init 0 0)
-         [:top c] (update model :top-counter counter/reconcile c)
-         [:bottom c] (update model :bottom-counter counter/reconcile c)))
+         [:top a] (update model :top-counter counter/reconcile a)
+         [:bottom a] (update model :bottom-counter counter/reconcile a)))
 
 (defn view-model
   [model]
@@ -36,13 +35,9 @@
    [counter/view (:bottom-counter view-model) (ui/tagged dispatch :bottom)]
    [:button {:on-click #(dispatch :on-reset)} "Reset"]])
 
-(defonce model (r/atom (init 1 2)))
-(defn example
-  []
-  (ui/connect model view-model view (ui/wrap-log-signals control) (ui/wrap-log-actions reconcile)))
-
-(defn example-view
-  "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.
-  In particalur, :on-connect will not be triggered on each reload."
-  []
-  (:view (example)))
+(def spec
+  {:init       init
+   :view-model view-model
+   :view       view
+   :control    control
+   :reconcile  reconcile})
