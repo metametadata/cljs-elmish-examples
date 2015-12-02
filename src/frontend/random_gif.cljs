@@ -1,8 +1,5 @@
 (ns frontend.random-gif
-  (:require [frontend.ui :as ui]
-            [frontend.giphy-api :as giphy]
-            [reagent.core :as r]
-            [cljs.core.match :refer-macros [match]]))
+  (:require [cljs.core.match :refer-macros [match]]))
 
 (defn init
   "Creates a gif with specified topic and waiting indicator."
@@ -11,7 +8,7 @@
    :gif-url "https://media.giphy.com/media/bIvp5gwLq9MEo/giphy.gif"})
 
 (defn new-control
-  "Example of injecting external dependency."
+  "Example of using external dependency"
   [gif-fetcher]
   (fn control
     [model signal dispatch]
@@ -38,16 +35,10 @@
    [:img {:style {:width 150}
           :src   (:gif-url view-model)}]])
 
-(defonce model (r/atom (init "funny cats")))
-(defn example
-  []
-  (ui/connect model view-model view
-              (-> (new-control giphy/get-random-gif)
-                  ui/wrap-log-signals)
-              (ui/wrap-log-actions reconcile)))
-
-(defn example-view
-  "Wrapper to get rid of unnecessary calls to ui/connect on Figwheel reloads.
-  In particalur, :on-connect will not be triggered on each reload."
-  []
-  (:view (example)))
+(defn new-spec
+  [gif-fether]
+  {:init       init
+   :view-model view-model
+   :view       view
+   :control    (new-control gif-fether)
+   :reconcile  reconcile})
