@@ -14,10 +14,6 @@
 
 (enable-console-print!)
 
-(defn title
-  [text]
-  [:div {:style {:margin-left "2em" :margin-right "1em"}} text])
-
 ; this atom will not be reset on figwheel reloads
 (defonce hot-reload-storage (transient {}))
 
@@ -38,6 +34,10 @@
 (def counter-example (-> counter/spec
                          ui/wrap-log
                          (ui/connect-reagent [1])))
+
+(defn title
+  [text]
+  [:div {:style {:margin-left "2em" :margin-right "1em"}} text])
 
 (defn app-view
   []
