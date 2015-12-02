@@ -17,7 +17,6 @@ model -> (view-model) -> (view) -signal-> (control) -action-> (reconcile) -> mod
 ```
     
 * no addresses; communication is performed by calling explicit (dispatch) function
-* *random-gif-list* uses Specter to update the nested model; compare it to more verbose "vanilla" updates in *counter-list*
 * hot-reloading for free, thanks to Figwheel
 * it's possible to manually dispatch signals and actions via Figwheel REPL and immediately see results in a browser:
   
@@ -69,6 +68,7 @@ for instance, this is how gif fetcher client is injected in *random-gif*:
 ; 1) when unit testing control behavior it should be easy to stub async API code
 ; 2) parent components will be able to inject a different API client (e.g. Imgur one)
 ```
+* *random-gif-list* uses Specter to update the nested model; compare it to more verbose "vanilla" updates in *counter-list*
 
 ## Build
 
