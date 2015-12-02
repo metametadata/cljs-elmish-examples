@@ -2,35 +2,35 @@
   (:require [frontend.ui :as ui]
             [cljs.core.match :refer-macros [match]]))
 
-(defn -init
+(defn init
   "Pure function. Creates a model intance."
-  [x _env_]
+  [x]
   x)
 
-(defn -control
+(defn control
   "Non-pure signal handler.
   Based on current model snapshot and received signal it can dispatch actions further to reconcile."
-  [_model_ signal dispatch _env_]
+  [_model_ signal dispatch]
   (match signal
          :on-connect nil
          :on-increment (dispatch :increment)
          :on-decrement (dispatch :decrement)))
 
-(defn -reconcile
+(defn reconcile
   "Pure function. It returns a new model based on current model snapshot and received action."
-  [model action _env_]
+  [model action]
   (match action
          :increment (inc model)
          :decrement (dec model)))
 
-(defn -view-model
+(defn view-model
   "Pure function. Given a model snapshot returns an immutable value for view to display."
-  [model _env_]
+  [model]
   (str "#" model))
 
-(defn -view
+(defn view
   "Pure function. View is given an immutable view-model and a signal dispatching function."
-  [view-model dispatch _env_]
+  [view-model dispatch]
   [:div
    [:button {:on-click #(dispatch :on-increment)} "+"]
    [:span view-model]
@@ -45,15 +45,15 @@
    [:button {:on-click #(dispatch :on-decrement)} "-"]
    [:button {:on-click #(dispatch-on-remove)} "X"]])
 
-(def counter
-    {:init       -init
-     :view-model -view-model
-     :view       -view
-     :control    -control
-     :reconcile  -reconcile})
+(def spec
+  {:init       init
+   :view-model view-model
+   :view       view
+   :control    control
+   :reconcile  reconcile})
 
 (defn example
   []
-  (-> counter
+  (-> spec
       ui/wrap-log
-      (ui/connect-reagent {} 1)))
+      (ui/connect-reagent 1)))

@@ -9,7 +9,6 @@
 
   :control can be a non-pure function, :init, :view-model, :view and :reconcile must be pure functions.
 
-  env map will be passed to all functions as a last arg, so it can be used to inject external dependencies.
   init-args will be passed to :init function.
 
   Dispatches :on-connect signal and returns a map with:
@@ -24,14 +23,13 @@
   V
   model -> (view-model) -> (view) -signal-> (control) -action-> (reconcile) -> model -> etc."
   [{:as _spec_ :keys [init view-model view control reconcile]}
-   env
    & init-args]
-  (let [model (apply init (concat init-args [env]))
+  (let [model (apply init init-args)
         model-ratom (r/atom model)]
     ; for now dispatch functions return nil to make API even smaller
-    (letfn [(dispatch-action [action] (swap! model-ratom reconcile action env) nil)
-            (dispatch-signal [signal] (control @model-ratom signal dispatch-action env) nil)
-            (reagent-view [] [view (view-model @model-ratom env) dispatch-signal env])]
+    (letfn [(dispatch-action [action] (swap! model-ratom reconcile action) nil)
+            (dispatch-signal [signal] (control @model-ratom signal dispatch-action) nil)
+            (reagent-view [] [view (view-model @model-ratom) dispatch-signal])]
       (dispatch-signal :on-connect)
 
       {:view            reagent-view
@@ -53,13 +51,13 @@
   [spec]
   (-> spec
       (update :control #(fn control
-                         [model signal dispatch env]
+                         [model signal dispatch]
                          (println "signal =" signal)
-                         (% model signal dispatch env)))
+                         (% model signal dispatch)))
       (update :reconcile #(fn reconcile
-                           [model action env]
+                           [model action]
                            (println "  action =" action)
-                           (let [result (% model action env)]
+                           (let [result (% model action)]
                              ;(println "   " model)
                              ;(println "     ->")
                              (println "   " result)
