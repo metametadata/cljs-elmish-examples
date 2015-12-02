@@ -28,7 +28,7 @@ cljs.user=> (ns frontend.core)
 
 frontend.core=> ((:dispatch-action counter-example) :increment)
 ```
-* component functions (init, view-model, view, control, reconcile) can passed around in "spec" maps for easier 
+* component functions (init, view-model, view, control, reconcile) can be passed around in "spec" maps for easier 
 middleware wrapping and using in generic components:
 
 ```clj
@@ -41,7 +41,7 @@ middleware wrapping and using in generic components:
 ```
 * example models are persisted per Figwheel session by using *persistence-middleware*, 
 so that on hot-reloading the models are not reset to initial state (but reloading the browser tab will reset the models)
- * external dependencies can be easily injected into components by using closures and spec factories; 
+* external dependencies can be easily injected into components by using closures and spec factories; 
 for instance, this is how gif fetcher client is injected in *random-gif*:
 
 ```clj
