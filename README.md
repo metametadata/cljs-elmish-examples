@@ -16,7 +16,7 @@ can dispatch "actions" to a pure (reconcile) function which updates a model, i.e
 model -> (view-model) -> (view) -signal-> (control) -action-> (reconcile) -> model -> etc.
 ```
     
-* no addresses; communication is performed by calling explicit (dispatch) function
+* no addresses; communication is performed by calling explicit (dispatch) functions
 * hot-reloading for free, thanks to Figwheel
 * it's possible to manually dispatch signals and actions via Figwheel REPL and immediately see results in a browser:
   
