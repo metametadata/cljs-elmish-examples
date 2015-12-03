@@ -70,6 +70,16 @@ for instance, this is how gif fetcher client is injected in *random-gif*:
 ```
 * *random-gif-list* uses Specter to update the nested model; compare it to more verbose "vanilla" updates in *counter-list*
 
+## TODO
+
+```
+- It's still a question to me, how to write big apps using this or original pattern. In particular, 
+generic-list looks cool, but is it usable in a bigger app, e.g. to handle some part of the app model?
+Maybe in a bigger app there would be a lot of dumb/stateless components and just a few stateful "sub-apps"/containers?
+In this case having explicit view-model function a part of the pattern may not be justified, because all view-model logic will
+be in stateless components.
+```
+
 ## Build
 
 To get an interactive development environment run:
