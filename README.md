@@ -69,15 +69,29 @@ for instance, this is how gif fetcher client is injected in *random-gif*:
 ; 2) parent components will be able to inject a different API client (e.g. Imgur one)
 ```
 * *random-gif-list* uses Specter to update the nested model; compare it to more verbose "vanilla" updates in *counter-list*
+* Action dispatch function must return the new model.
+It allows controller perform additional side-effects after action is handled (e.g. send updated model to server).
+But it makes code for controlling subcomponents brittler, for instance:
+
+```clj
+; from counter-list.cljs
+(defn control
+  [model signal dispatch]
+  (match signal
+    ; ...
+    [[:on-modify id] s]
+    (-update-counter model id
+                     counter/control
+                     s
+                     ; note how here we have to extract the subcomponent model, because it may be used in counter/control
+                     #(-> (dispatch [[:modify id] %])
+                          (-get-counter id))))
 
 ## TODO
-
-```
 - It's still a question to me, how to write big apps using this or original pattern. In particular, 
 generic-list looks cool, but is it usable in a bigger app, e.g. to handle some part of the app model?
 Maybe in a bigger app there would be a lot of dumb/stateless components and just a few stateful "sub-apps"/containers?
-In this case having explicit view-model function a part of the pattern may not be justified, because all view-model logic will
-be in stateless components.
+It seems to me, that Elm-ish architecture will not work well when different components must share some part of the single state data.
 ```
 
 ## Build

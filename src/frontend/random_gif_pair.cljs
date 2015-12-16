@@ -15,14 +15,14 @@
     (match signal
            :on-connect
            (do
-             ((random-gif/new-control gif-fetcher) (:left model) :on-connect (ui/tagged dispatch :left))
-             ((random-gif/new-control gif-fetcher) (:right model) :on-connect (ui/tagged dispatch :right)))
+             ((random-gif/new-control gif-fetcher) (:left model) :on-connect #(:left (dispatch [:left %])))
+             ((random-gif/new-control gif-fetcher) (:right model) :on-connect #(:right (dispatch [:right %]))))
 
            [:left s]
-           ((random-gif/new-control gif-fetcher) (:left model) s (ui/tagged dispatch :left))
+           ((random-gif/new-control gif-fetcher) (:left model) s  #(:left (dispatch [:left %])))
 
            [:right s]
-           ((random-gif/new-control gif-fetcher) (:right model) s (ui/tagged dispatch :right)))))
+           ((random-gif/new-control gif-fetcher) (:right model) s #(:right (dispatch [:right %]))))))
 
 (defn reconcile
   [model action]

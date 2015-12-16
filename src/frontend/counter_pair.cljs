@@ -13,8 +13,8 @@
   (match signal
          :on-connect nil
          :on-reset (dispatch :reset)
-         [:top s] (counter/control (:top-counter model) s (ui/tagged dispatch :top))
-         [:bottom s] (counter/control (:bottom-counter model) s (ui/tagged dispatch :bottom))))
+         [:top s] (counter/control (:top-counter model) s #(:top-counter (dispatch [:top %])))
+         [:bottom s] (counter/control (:bottom-counter model) s #(:bottom-counter (dispatch [:bottom %])))))
 
 (defn reconcile
   [model action]
