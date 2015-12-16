@@ -27,6 +27,13 @@
   [model f & args]
   (apply -update-counters* model (constantly true) f args))
 
+(defn -get-counter
+  [model id]
+  (->> (:counters model)
+       (filter #(= (first %) id))
+       first
+       second))
+
 (defn control
   [model signal dispatch]
   (match signal
@@ -36,7 +43,10 @@
 
          [[:on-modify id] s]
          (-update-counter model id
-                          counter/control s (ui/tagged dispatch [:modify id]))))
+                          counter/control
+                          s
+                          #(-> (dispatch [[:modify id] %])
+                               (-get-counter id)))))
 
 (defn reconcile
   [model action]

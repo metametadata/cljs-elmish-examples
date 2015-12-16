@@ -26,6 +26,13 @@
   [model f & args]
   (apply -update-items* model (constantly true) f args))
 
+(defn -get-item
+  [model id]
+  (->> (:items model)
+       (filter #(= (:id %) id))
+       first
+       :item))
+
 (defn new-control
   [item-spec]
   (fn control
@@ -34,21 +41,21 @@
            :on-connect nil
 
            :on-insert
-           (dispatch :insert)
-
-           ; pattern does not allow sending :on-connect to new item from :on-insert
-           ; (because we can't get a new model after dispatching an action),
-           ; so this special signal should be explicitly dispatched after insertion
-           [:on-connect-item id]
-           ; we call self here only to get rid of code duplication
-           (control model [[:on-item-signal id] :on-connect] dispatch)
+           (let [new-id (:next-id model)]
+             (-> (dispatch :insert)
+                 ; we call self here only to get rid of code duplication
+                 (control [[:on-item-signal new-id] :on-connect] dispatch)))
 
            [:on-remove id]
            (dispatch [:remove id])
 
            [[:on-item-signal id] s]
            (-update-item model id
-                         (:control item-spec) s (ui/tagged dispatch [:item-action id])))))
+                         (:control item-spec)
+                         s
+                         ; make sure that item's control gets new item model after action is handled
+                         #(-> (dispatch [[:item-action id] %])
+                              (-get-item id))))))
 
 (defn new-reconcile
   [item-spec item-init-args]
@@ -87,8 +94,7 @@
   (fn -view
     [view-model dispatch]
     (let [items (-item-views (:items view-model) dispatch item-spec)
-          insert [:button {:on-click #(do (dispatch :on-insert)
-                                          (dispatch [:on-connect-item (:next-id view-model)]))} "Insert"]]
+          insert [:button {:on-click #(dispatch :on-insert)} "Insert"]]
       (into [:div insert] items))))
 
 (defn new-spec

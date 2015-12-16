@@ -15,7 +15,7 @@
       :view (Reagent view function),
       :dispatch-signal (it can be used to dispatch signals not only from the view),
       :model ratom (this is exposed mainly for debugging),
-      :dispatch-action (this is exposed mainly for debugging).
+      :dispatch-action (this is exposed mainly for debugging) - returns updated model.
 
   Data flow:
   (init)
@@ -26,8 +26,7 @@
    init-args]
   (let [model (apply init init-args)
         model-ratom (r/atom model)]
-    ; for now dispatch functions return nil to make API even smaller
-    (letfn [(dispatch-action [action] (swap! model-ratom reconcile action) nil)
+    (letfn [(dispatch-action [action] (swap! model-ratom reconcile action))
             (dispatch-signal [signal] (control @model-ratom signal dispatch-action) nil)
             (reagent-view [] [view (view-model @model-ratom) dispatch-signal])]
       (dispatch-signal :on-connect)

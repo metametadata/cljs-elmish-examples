@@ -26,14 +26,14 @@ frontend.core.hot_reload_storage = cljs.core.transient$.call(null,cljs.core.Pers
  */
 frontend.core.example_view = (function frontend$core$example_view(var_args){
 var args__17816__auto__ = [];
-var len__17809__auto___23704 = arguments.length;
-var i__17810__auto___23705 = (0);
+var len__17809__auto___29566 = arguments.length;
+var i__17810__auto___29567 = (0);
 while(true){
-if((i__17810__auto___23705 < len__17809__auto___23704)){
-args__17816__auto__.push((arguments[i__17810__auto___23705]));
+if((i__17810__auto___29567 < len__17809__auto___29566)){
+args__17816__auto__.push((arguments[i__17810__auto___29567]));
 
-var G__23706 = (i__17810__auto___23705 + (1));
-i__17810__auto___23705 = G__23706;
+var G__29568 = (i__17810__auto___29567 + (1));
+i__17810__auto___29567 = G__29568;
 continue;
 } else {
 }
@@ -50,12 +50,12 @@ return new cljs.core.Keyword(null,"view","view",1247994814).cljs$core$IFn$_invok
 
 frontend.core.example_view.cljs$lang$maxFixedArity = (2);
 
-frontend.core.example_view.cljs$lang$applyTo = (function (seq23701){
-var G__23702 = cljs.core.first.call(null,seq23701);
-var seq23701__$1 = cljs.core.next.call(null,seq23701);
-var G__23703 = cljs.core.first.call(null,seq23701__$1);
-var seq23701__$2 = cljs.core.next.call(null,seq23701__$1);
-return frontend.core.example_view.cljs$core$IFn$_invoke$arity$variadic(G__23702,G__23703,seq23701__$2);
+frontend.core.example_view.cljs$lang$applyTo = (function (seq29563){
+var G__29564 = cljs.core.first.call(null,seq29563);
+var seq29563__$1 = cljs.core.next.call(null,seq29563);
+var G__29565 = cljs.core.first.call(null,seq29563__$1);
+var seq29563__$2 = cljs.core.next.call(null,seq29563__$1);
+return frontend.core.example_view.cljs$core$IFn$_invoke$arity$variadic(G__29564,G__29565,seq29563__$2);
 });
 frontend.core.counter_example = frontend.ui.connect_reagent.call(null,frontend.ui.wrap_log.call(null,frontend.counter.spec),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [(1)], null));
 frontend.core.title = (function frontend$core$title(text){
@@ -74,4 +74,4 @@ frontend.core.on_js_reload = (function frontend$core$on_js_reload(){
 return null;
 });
 
-//# sourceMappingURL=core.js.map?rel=1449083086030
+//# sourceMappingURL=core.js.map?rel=1450279744529

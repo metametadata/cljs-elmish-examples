@@ -27,6 +27,13 @@
   [model f & args]
   (apply -update-gifs* model (constantly true) f args))
 
+(defn -get-gif
+  [model id]
+  (->> (:gifs model)
+       (filter #(= (:id %) id))
+       first
+       :item))
+
 (defn new-control
   [gif-fetcher]
   (fn control
@@ -38,17 +45,17 @@
            (dispatch [:set-topic val])
 
            :on-insert
-           (do
-             (dispatch :insert)
-
-             ; TODO: it's better to dispatch :on-connect to created gif by sending additional [:on-connect-gif id] signal
-             (gif-fetcher
-               (:topic model)
-               #((ui/tagged dispatch [:sub-action (:next-id model)]) [:set-new-gif %])))
+           (let [new-id (:next-id model)]
+             (-> (dispatch :insert)
+                 ; we call self here only to get rid of code duplication
+                 (control [[:on-sub-signal new-id] :on-connect] dispatch)))
 
            [[:on-sub-signal id] s]
            (-update-gif model id
-                        (random-gif/new-control gif-fetcher) s (ui/tagged dispatch [:sub-action id])))))
+                        (random-gif/new-control gif-fetcher)
+                        s
+                        #(-> (dispatch [[:sub-action id] %])
+                             (-get-gif id))))))
 
 (defn reconcile
   [model action]
