@@ -2,7 +2,7 @@
 
 [DEMO](http://metametadata.github.io/cljs-elmish-examples/)
 
-Also take a look at my TodoMVC implementation using the same pattern [HERE](https://github.com/metametadata/cljs-elmish-todomvc).
+Also take a look at my TodoMVC implementation using the same pattern [HERE](https://github.com/metametadata/cljs-elmish-todomvc) and saee the pattern explored further in [Carry](https://github.com/metametadata/carry) framework.
 
 ## Highlights
 * (view-model) function is applied before handing model to a view
